@@ -1,0 +1,20 @@
+[project]
+name = "legal-research-assistant"
+version = "0.1.0"
+description = "Legal information triage: issue-spotting, jurisdiction-filtered retrieval, cited answers or a refusal"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "pyyaml>=6.0",
+    "numpy>=1.26",
+    "chromadb>=0.5",
+    "sentence-transformers>=3.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["legal*"]
