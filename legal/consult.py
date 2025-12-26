@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from . import llm, retrieve
+from . import gate, llm, retrieve
 from .ingest import Provision
 from .issues import spot
 
@@ -33,6 +33,7 @@ class Consultation:
     jurisdiction: str | None = None
     urgent: bool = False
     options: list[str] = field(default_factory=list)
+    problems: list[str] = field(default_factory=list)
 
 
 def consult(description: str, jurisdiction: str | None = None) -> Consultation:
@@ -56,5 +57,8 @@ def consult(description: str, jurisdiction: str | None = None) -> Consultation:
                      {"role": "user", "content": f"Provisions:\n{context}\n\nFacts:\n{facts}\n\nQuestions: {'; '.join(s.issues)}"}])
     if CANNOT in text:
         return Consultation("refused", issues=s.issues, jurisdiction=jur, urgent=s.urgent)
+    problems = gate.check(text, provs)
+    if problems:
+        return Consultation("refused", issues=s.issues, jurisdiction=jur, urgent=s.urgent, problems=problems)
     cited = [p.citation for i, p in enumerate(provs, 1) if f"[{i}]" in text]
     return Consultation("answered", text.strip(), cited, s.issues, jur, s.urgent)
