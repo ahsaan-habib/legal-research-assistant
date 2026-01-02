@@ -25,7 +25,7 @@ def lawyer_brief(c: Consultation, facts: list[str] | None = None) -> str:
     return "\n".join(lines)
 
 
-def render(c: Consultation, facts: list[str] | None = None) -> str:
+def render(c: Consultation) -> str:
     parts = []
     if c.urgent:
         parts.append(URGENT)
@@ -38,6 +38,6 @@ def render(c: Consultation, facts: list[str] | None = None) -> str:
         parts.append(c.text)
         parts.append("Sources: " + "; ".join(c.citations))
     if c.status != "need_jurisdiction":
-        parts.append(lawyer_brief(c, facts))
+        parts.append(lawyer_brief(c, c.facts))
     parts.append(DISCLAIMER)
     return "\n\n".join(parts)

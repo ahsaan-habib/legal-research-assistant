@@ -10,7 +10,12 @@ dependencies = [
     "numpy>=1.26",
     "chromadb>=0.5",
     "sentence-transformers>=3.0",
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.30",
 ]
+
+[project.scripts]
+legal = "legal.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]

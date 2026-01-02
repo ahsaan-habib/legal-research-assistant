@@ -34,6 +34,7 @@ class Consultation:
     urgent: bool = False
     options: list[str] = field(default_factory=list)
     problems: list[str] = field(default_factory=list)
+    facts: list[str] = field(default_factory=list)
 
 
 def consult(description: str, jurisdiction: str | None = None) -> Consultation:
@@ -41,7 +42,7 @@ def consult(description: str, jurisdiction: str | None = None) -> Consultation:
     s = spot(description, known)
     jur = (jurisdiction or s.jurisdiction or "").upper() or None
     if jur not in known:
-        return Consultation("need_jurisdiction", issues=s.issues, urgent=s.urgent, options=known)
+        return Consultation("need_jurisdiction", issues=s.issues, urgent=s.urgent, options=known, facts=s.facts)
 
     provisions: dict[str, Provision] = {}
     for q in s.issues:
@@ -49,16 +50,17 @@ def consult(description: str, jurisdiction: str | None = None) -> Consultation:
             provisions.setdefault(p.id, p)
     provs = list(provisions.values())[:8]
     if not provs:
-        return Consultation("refused", issues=s.issues, jurisdiction=jur, urgent=s.urgent)
+        return Consultation("refused", issues=s.issues, jurisdiction=jur, urgent=s.urgent, facts=s.facts)
 
     context = "\n\n".join(f"[{i}] {p.citation} — {p.section}\n{p.text}" for i, p in enumerate(provs, 1))
     facts = "\n".join(f"- {f}" for f in s.facts) or description
     text = llm.chat([{"role": "system", "content": SYSTEM},
                      {"role": "user", "content": f"Provisions:\n{context}\n\nFacts:\n{facts}\n\nQuestions: {'; '.join(s.issues)}"}])
     if CANNOT in text:
-        return Consultation("refused", issues=s.issues, jurisdiction=jur, urgent=s.urgent)
+        return Consultation("refused", issues=s.issues, jurisdiction=jur, urgent=s.urgent, facts=s.facts)
     problems = gate.check(text, provs)
     if problems:
-        return Consultation("refused", issues=s.issues, jurisdiction=jur, urgent=s.urgent, problems=problems)
+        return Consultation("refused", issues=s.issues, jurisdiction=jur, urgent=s.urgent, problems=problems,
+                            facts=s.facts)
     cited = [p.citation for i, p in enumerate(provs, 1) if f"[{i}]" in text]
-    return Consultation("answered", text.strip(), cited, s.issues, jur, s.urgent)
+    return Consultation("answered", text.strip(), cited, s.issues, jur, s.urgent, facts=s.facts)
