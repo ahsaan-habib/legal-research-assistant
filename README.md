@@ -37,7 +37,7 @@ description ─▶ issue spotting (queries, facts, urgency; jurisdiction only if
 ## Run it
 
 ```bash
-ollama pull qwen3:4b
+ollama pull qwen3:4b-instruct   # not plain qwen3:4b: that tag is now a thinking-only build
 python -m venv .venv && .venv/bin/pip install -e . && source .venv/bin/activate
 legal index
 legal ask "I bought a kettle online 3 weeks ago in Examplia and it stopped working" -j EX
