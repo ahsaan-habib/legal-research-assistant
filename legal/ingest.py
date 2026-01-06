@@ -29,7 +29,8 @@ class Provision:
 
     @property
     def citation(self) -> str:
-        num = re.match(r"(?:Section|s\.?)\s*([\w.]+)", self.section, re.I)
+        # the number must start with a digit, or "Schedule 2" reads as "s.chedule"
+        num = re.match(r"(?:Section|s\.?)\s*(\d[\w.]*)", self.section, re.I)
         return f"{self.instrument}, s.{num.group(1)}" if num else f"{self.instrument}, {self.section}"
 
 
