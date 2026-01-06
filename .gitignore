@@ -5,3 +5,4 @@ __pycache__/
 *.egg-info/
 .chroma/
 corpus/uk/
+.pytest_cache/
